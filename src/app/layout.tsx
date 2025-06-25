@@ -31,7 +31,7 @@ export default function RootLayout({
 				<nav className='bg-league-dark border-b border-league-medium shadow-sm'>
 					<div className='container mx-auto px-4 py-3 flex justify-between items-center'>
 						<div className='text-xl font-bold tracking-tight text-league-light'>
-							<Link href='/'>Soccer League</Link>
+							<Link href='/'>⚽ Soccer League</Link>
 						</div>
 						<div className='flex items-center space-x-6'>
 							<Link
@@ -48,7 +48,7 @@ export default function RootLayout({
 							</Link>
 							<Link
 								href='/login'
-								className='ml-4 px-4 py-1 bg-white text-league-dark rounded shadow hover:bg-league-light border border-league-mediumdark font-semibold transition'
+								className='ml-4 px-4 py-1 bg-white text-black rounded shadow hover:bg-league-light border border-league-mediumdark font-semibold transition'
 							>
 								Login
 							</Link>

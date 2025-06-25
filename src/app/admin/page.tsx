@@ -8,6 +8,12 @@ export default function AdminDashboardPage() {
 			</h1>
 			<div className='flex flex-col gap-6 max-w-md'>
 				<Link
+					href='/admin/leagues'
+					className='px-6 py-4 bg-league-mediumdark text-league-light rounded shadow hover:bg-league-dark font-semibold transition text-lg'
+				>
+					Manage Leagues
+				</Link>
+				<Link
 					href='/admin/teams'
 					className='px-6 py-4 bg-league-mediumdark text-league-light rounded shadow hover:bg-league-dark font-semibold transition text-lg'
 				>
