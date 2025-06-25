@@ -1,5 +1,95 @@
 [
-	{ "id": "1", "name": "Premier League", "sport": "Outdoor Soccer" },
-	{ "id": "2", "name": "La Liga", "sport": "Outdoor Soccer" },
-	{ "id": "3", "name": "Bundesliga", "sport": "Indoor Soccer" }
+	{
+		"id": "1",
+		"name": "Premier League",
+		"type": "LeagueRoundRobin",
+		"demographic": "Mens Amateur",
+		"division": "Mens",
+		"sport": "10 v 10 Soccer",
+		"rulesUrl": "https://example.com/rules-premier",
+		"startDate": "2025-03-23",
+		"endDate": "2025-06-29",
+		"status": "InProgress",
+		"teamFee": "",
+		"playerFee": "",
+		"otherFeeInfo": "",
+		"moreInfo": "",
+		"standingsOptions": {
+			"pointsFormula": {
+				"W": 3,
+				"L": 0,
+				"T": 1,
+				"OTW": 0,
+				"OTL": 0,
+				"RTW": 0,
+				"RTL": 0,
+				"F": 0,
+				"D": 0,
+				"BP": 0
+			},
+			"tiebreakers": []
+		}
+	},
+	{
+		"id": "2",
+		"name": "La Liga",
+		"type": "LeagueRoundRobin",
+		"demographic": "Mens Amateur",
+		"division": "Mens",
+		"sport": "10 v 10 Soccer",
+		"rulesUrl": "https://example.com/rules-laliga",
+		"startDate": "2025-03-23",
+		"endDate": "2025-06-29",
+		"status": "InProgress",
+		"teamFee": "",
+		"playerFee": "",
+		"otherFeeInfo": "",
+		"moreInfo": "",
+		"standingsOptions": {
+			"pointsFormula": {
+				"W": 3,
+				"L": 0,
+				"T": 1,
+				"OTW": 0,
+				"OTL": 0,
+				"RTW": 0,
+				"RTL": 0,
+				"F": 0,
+				"D": 0,
+				"BP": 0
+			},
+			"tiebreakers": []
+		}
+	},
+	{
+		"id": "3",
+		"name": "Bundesliga",
+		"type": "LeagueRoundRobin",
+		"demographic": "Mens Amateur",
+		"division": "Mens",
+		"sport": "10 v 10 Soccer",
+		"rulesUrl": "https://example.com/rules-bundesliga",
+		"startDate": "2025-03-23",
+		"endDate": "2025-06-29",
+		"status": "InProgress",
+		"teamFee": "",
+		"playerFee": "",
+		"otherFeeInfo": "",
+		"moreInfo": "",
+		"standingsOptions": {
+			"pointsFormula": {
+				"W": 3,
+				"L": 0,
+				"T": 1,
+				"OTW": 0,
+				"OTL": 0,
+				"RTW": 0,
+				"RTL": 0,
+				"F": 0,
+				"D": 0,
+				"BP": 0
+			},
+			"tiebreakers": []
+		}
+	}
 ]

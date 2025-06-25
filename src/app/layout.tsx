@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -28,34 +30,9 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-league-light text-league-black`}
 			>
-				<nav className='bg-league-dark border-b border-league-medium shadow-sm'>
-					<div className='container mx-auto px-4 py-3 flex justify-between items-center'>
-						<div className='text-xl font-bold tracking-tight text-league-light'>
-							<Link href='/'>⚽ Soccer League</Link>
-						</div>
-						<div className='flex items-center space-x-6'>
-							<Link
-								href='/'
-								className='text-league-light hover:text-league-medium'
-							>
-								Home
-							</Link>
-							<Link
-								href='/leagues'
-								className='text-league-light hover:text-league-medium'
-							>
-								Leagues
-							</Link>
-							<Link
-								href='/login'
-								className='ml-4 px-4 py-1 bg-white text-black rounded shadow hover:bg-league-light border border-league-mediumdark font-semibold transition'
-							>
-								Login
-							</Link>
-						</div>
-					</div>
-				</nav>
-				<main className='container mx-auto px-4 py-8'>{children}</main>
+				<Navbar />
+				<main className='container mx-auto px-4 py-8 mt-8'>{children}</main>
+				<Footer />
 			</body>
 		</html>
 	);
