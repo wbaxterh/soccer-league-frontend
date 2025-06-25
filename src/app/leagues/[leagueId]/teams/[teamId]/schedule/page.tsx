@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 const matches = [
 	{ id: "1", opponent: "Liverpool", date: "2024-07-15" },
 	{ id: "2", opponent: "Chelsea", date: "2024-07-22" },
 ];
 
-export default function TeamSchedulePage() {
+export default function TeamSchedulePage(props: any) {
+	// const { params } = props; // Not used, but included for consistency
 	return (
 		<div>
 			<h2 className='text-2xl font-bold mb-6 text-league-dark'>

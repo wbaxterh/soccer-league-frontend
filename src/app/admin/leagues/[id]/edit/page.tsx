@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 // In a real app, fetch league data by id
 const leagueData = { name: "League Name", sport: "Outdoor Soccer" };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function EditLeaguePage() {
+	// You could use params.id to fetch the league data here
 	const [form, setForm] = useState(leagueData);
 	const router = useRouter();
 

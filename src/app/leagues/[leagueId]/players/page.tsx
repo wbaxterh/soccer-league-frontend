@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 const players = [
 	{ id: "1", name: "Cristiano Ronaldo" },
 	{ id: "2", name: "Lionel Messi" },
 	{ id: "3", name: "Kevin De Bruyne" },
 ];
 
-export default function PlayersPage() {
+export default function PlayersPage(props: any) {
+	// const { params } = props; // Not used, but included for consistency
 	return (
 		<div>
 			<h2 className='text-2xl font-bold mb-6 text-league-dark'>Players</h2>

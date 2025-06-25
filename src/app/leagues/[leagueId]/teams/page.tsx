@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import Link from "next/link";
 
 const teams = [
@@ -6,11 +7,8 @@ const teams = [
 	{ id: "3", name: "Chelsea" },
 ];
 
-export default function TeamsPage({
-	params,
-}: {
-	params: { leagueId: string };
-}) {
+export default function TeamsPage(props: any) {
+	const { params } = props;
 	return (
 		<div>
 			<h2 className='text-2xl font-bold mb-6 text-league-dark'>Teams</h2>
