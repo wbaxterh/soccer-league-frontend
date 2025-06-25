@@ -1,0 +1,76 @@
+{
+	"name": "soccer-league-frontend",
+	"description": "React/Next.js frontend for a soccer league app that supports scheduling, team/player management, and game tracking. Designed for league admins and public viewers.",
+	"techStack": [
+		"React",
+		"Next.js",
+		"TypeScript",
+		"Tailwind CSS",
+		"React Hook Form",
+		"Zod",
+		"Axios",
+		"SWR"
+	],
+	"features": [
+		"Public league view with schedule and standings",
+		"Admin dashboard for managing leagues, teams, players, and games",
+		"Editable forms for teams and players",
+		"Game results entry and live schedule updates",
+		"Division filters for viewing schedules or teams",
+		"Mobile-responsive UI using Tailwind"
+	],
+	"pages": {
+		"/": "Home page, shows available leagues",
+		"/leagues/[id]": "League detail page with standings, teams, schedule",
+		"/admin": "Admin dashboard root, protected route",
+		"/admin/teams": "View and manage all teams in league",
+		"/admin/teams/[id]": "Edit team details",
+		"/admin/teams/[id]/players": "View players on a team",
+		"/admin/teams/[id]/players/[playerId]": "Edit player details",
+		"/admin/schedule": "Full game schedule by division, with result input",
+		"/admin/games/[id]": "Edit game (date/time/result)"
+	},
+	"components": [
+		"LeagueTable",
+		"TeamTable",
+		"PlayerTable",
+		"ScheduleTable",
+		"TeamForm",
+		"PlayerForm",
+		"GameForm",
+		"DivisionFilterDropdown",
+		"SidebarNav",
+		"ProtectedRouteWrapper"
+	],
+	"auth": {
+		"admin": {
+			"login": "Email/password based admin login",
+			"session": "Stored via JWT or cookie session",
+			"roles": ["admin"]
+		}
+	},
+	"apiRoutes": {
+		"base": "https://api.soccerhub.dev",
+		"examples": [
+			"GET /leagues/:id",
+			"GET /teams?leagueId=:id",
+			"POST /teams",
+			"GET /players?teamId=:id",
+			"POST /games",
+			"PATCH /games/:id"
+		]
+	},
+	"design": {
+		"admin": {
+			"Team Dashboard": "Table with team stats + View Roster/Edit buttons",
+			"Edit Team": "Form with Team Name, Division, Coach Info",
+			"Roster View": "Table with players (jersey #, name, DOB, contact)",
+			"Schedule": "Table with date/time/field/home/away/result, filterable by division"
+		}
+	},
+	"notes": [
+		"Based on screenshots of EZLeagues as reference",
+		"Prioritizing MVP for one league, multi-league support later",
+		"Public pages don't require login, admin pages do"
+	]
+}
