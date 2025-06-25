@@ -1,0 +1,5 @@
+[
+	{ "id": "1", "name": "Premier League", "sport": "Outdoor Soccer" },
+	{ "id": "2", "name": "La Liga", "sport": "Outdoor Soccer" },
+	{ "id": "3", "name": "Bundesliga", "sport": "Indoor Soccer" }
+]
