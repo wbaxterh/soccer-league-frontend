@@ -29,8 +29,6 @@ const outcomes = [
 
 export default function StandingsOptionsPage() {
 	const [formula, setFormula] = useState(defaultFormula);
-	// Tiebreakers UI coming soon
-	const tiebreakers = [];
 
 	const handleChange = (key: string, value: string) => {
 		setFormula((f) => ({ ...f, [key]: Number(value) }));

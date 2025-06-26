@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import Link from "next/link";
+import { use } from "react";
 
 const teams = [
 	{ id: "1", name: "Manchester United" },
@@ -7,8 +7,13 @@ const teams = [
 	{ id: "3", name: "Chelsea" },
 ];
 
-export default function TeamsPage(props: any) {
-	const { params } = props;
+export default function TeamsPage({
+	params,
+}: {
+	params: Promise<{ leagueId: string }>;
+}) {
+	const { leagueId } = use(params);
+
 	return (
 		<div>
 			<h2 className='text-2xl font-bold mb-6 text-league-dark'>Teams</h2>
@@ -16,7 +21,7 @@ export default function TeamsPage(props: any) {
 				{teams.map((team) => (
 					<li key={team.id}>
 						<Link
-							href={`/leagues/${params.leagueId}/teams/${team.id}`}
+							href={`/leagues/${leagueId}/teams/${team.id}`}
 							className='block px-4 py-3 bg-league-light text-league-black rounded shadow hover:bg-league-medium border border-league-mediumdark font-semibold transition'
 						>
 							{team.name}

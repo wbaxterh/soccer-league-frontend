@@ -1,11 +1,36 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import leagues from "@/data/leagues.json";
+import { use } from "react";
 
-export default function LeagueDetailPage(props: any) {
-	const { params } = props;
-	const league = leagues.find((l) => l.id === params.leagueId);
+interface League {
+	id: string;
+	name: string;
+	type: string;
+	demographic: string;
+	division: string;
+	sport: string;
+	rulesUrl: string;
+	startDate: string;
+	endDate: string;
+	status: string;
+	teamFee: string;
+	playerFee: string;
+	otherFeeInfo: string;
+	moreInfo: string;
+	standingsOptions?: {
+		pointsFormula: Record<string, number>;
+		tiebreakers: string[];
+	};
+}
+
+export default function LeagueDetailPage({
+	params,
+}: {
+	params: Promise<{ leagueId: string }>;
+}) {
+	const { leagueId } = use(params);
+	const league = (leagues as League[]).find((l) => l.id === leagueId);
 	if (!league) return notFound();
 
 	return (

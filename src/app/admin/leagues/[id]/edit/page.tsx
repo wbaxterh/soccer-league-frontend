@@ -4,10 +4,32 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import leaguesData from "@/data/leagues.json";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export default function EditLeaguePage(props: any) {
+interface League {
+	id: string;
+	name: string;
+	type: string;
+	demographic: string;
+	division: string;
+	sport: string;
+	rulesUrl: string;
+	startDate: string;
+	endDate: string;
+	status: string;
+	teamFee: string;
+	playerFee: string;
+	otherFeeInfo: string;
+	moreInfo: string;
+	standingsOptions?: {
+		pointsFormula: Record<string, number>;
+		tiebreakers: string[];
+	};
+}
+
+export default function EditLeaguePage(props: {
+	params: Promise<{ id: string }>;
+}) {
 	const [leagueId, setLeagueId] = useState<string | null>(null);
-	const [form, setForm] = useState<any>(null);
+	const [form, setForm] = useState<League | null>(null);
 	const router = useRouter();
 
 	useEffect(() => {
@@ -18,7 +40,7 @@ export default function EditLeaguePage(props: any) {
 
 	useEffect(() => {
 		if (!leagueId) return;
-		const league = (leaguesData as any[]).find((l) => l.id === leagueId);
+		const league = (leaguesData as League[]).find((l) => l.id === leagueId);
 		if (league) setForm(league);
 	}, [leagueId]);
 
@@ -26,7 +48,7 @@ export default function EditLeaguePage(props: any) {
 		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
 	) => {
 		const { name, value } = e.target;
-		setForm((f: any) => ({ ...f, [name]: value }));
+		setForm((f) => (f ? { ...f, [name]: value } : f));
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
