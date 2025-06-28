@@ -1,27 +1,55 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
-const matches = [
-	{ id: "1", home: "Manchester United", away: "Liverpool", date: "2024-07-01" },
-	{ id: "2", home: "Chelsea", away: "Manchester United", date: "2024-07-08" },
-];
+"use client";
+import { use, useEffect, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { getGames } from "@/api/games";
+import { getTeams } from "@/api/teams";
+import { Game, Team } from "@/api/types";
 
-export default function SchedulePage(props: any) {
-	// const { params } = props; // Not used, but included for consistency
+export default function SchedulePage({
+	params,
+}: {
+	params: Promise<{ leagueId: string }>;
+}) {
+	const { leagueId } = use(params);
+	const [matches, setMatches] = useState<Game[]>([]);
+	const [teams, setTeams] = useState<Team[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		if (!leagueId) return;
+		setLoading(true);
+		Promise.all([getGames(leagueId), getTeams(leagueId)])
+			.then(([gamesData, teamsData]) => {
+				setMatches(gamesData);
+				setTeams(teamsData);
+			})
+			.finally(() => setLoading(false));
+	}, [leagueId]);
+
+	if (loading) return <div>Loading...</div>;
+
+	const getTeamName = (id: string) =>
+		teams.find((t) => t.id === id)?.name || id;
+
 	return (
-		<div>
-			<h2 className='text-2xl font-bold mb-6 text-league-dark'>Schedule</h2>
-			<ul className='space-y-4'>
+		<div className='max-w-4xl mx-auto bg-card p-8 rounded shadow text-card-foreground border border-border'>
+			<h2 className='text-2xl font-bold mb-6 text-foreground'>Schedule</h2>
+			<div className='grid gap-4'>
 				{matches.map((match) => (
-					<li
-						key={match.id}
-						className='px-4 py-3 bg-league-light text-league-black rounded shadow border border-league-mediumdark font-semibold'
-					>
-						<div className='font-semibold'>
-							{match.home} vs {match.away}
-						</div>
-						<div className='text-league-mediumdark'>{match.date}</div>
-					</li>
+					<Card key={match.id}>
+						<CardContent className='py-4 font-semibold text-foreground text-lg'>
+							<div>
+								{getTeamName(match.home)} vs {getTeamName(match.away)}
+							</div>
+							{match.date && (
+								<div className='text-muted-foreground text-base font-normal'>
+									{match.date}
+								</div>
+							)}
+						</CardContent>
+					</Card>
 				))}
-			</ul>
+			</div>
 		</div>
 	);
 }

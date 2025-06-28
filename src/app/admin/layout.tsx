@@ -6,8 +6,8 @@ export default function AdminLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className='min-h-screen flex bg-league-light text-league-black'>
-			<aside className='w-64 bg-league-dark text-league-light flex flex-col py-8 px-4 space-y-8'>
+		<div className='min-h-screen flex bg-background text-foreground'>
+			<aside className='w-64 bg-card text-card-foreground flex flex-col py-8 px-4 space-y-8'>
 				<div className='text-2xl font-bold mb-8'>Admin</div>
 				<SidebarNav />
 			</aside>

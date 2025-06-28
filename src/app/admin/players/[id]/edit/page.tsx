@@ -1,67 +1,106 @@
 "use client";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useRouter } from "next/navigation";
-import teams from "@/data/teams.json";
+import { getTeams } from "@/api/teams";
+import { Team, Player } from "@/api/types";
+import {
+	Form,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormControl,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { updatePlayer } from "@/api/players";
+
+const formSchema = z.object({
+	name: z.string().min(1, "Name is required."),
+	teamIds: z.array(z.string()).min(1, "Select at least one team."),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 // In a real app, fetch player data by id
-const playerData = { name: "Player Name", team: "Team Name" };
+const playerData: Player = { name: "Player Name", id: "1", teamIds: ["1"] };
 
 export default function EditPlayerPage() {
-	const [form, setForm] = useState(playerData);
+	const form = useForm<FormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues: playerData,
+	});
 	const router = useRouter();
+	const [teams, setTeams] = useState<Team[]>([]);
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// In a real app, submit to API here
+	useEffect(() => {
+		getTeams().then(setTeams);
+	}, []);
+
+	const onSubmit = async (values: FormValues) => {
+		await updatePlayer(playerData.id, values);
 		router.push("/admin/players");
 	};
 
 	return (
-		<div className='max-w-lg mx-auto'>
-			<h2 className='text-2xl font-bold mb-6 text-league-dark'>Edit Player</h2>
-			<form
-				className='space-y-6 bg-league-light p-6 rounded shadow border border-league-mediumdark'
-				onSubmit={handleSubmit}
-			>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Name
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						value={form.name}
-						onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-						required
-						autoFocus
+		<div className='max-w-xl mx-auto bg-card p-8 rounded shadow text-card-foreground border border-border'>
+			<h2 className='text-2xl font-bold mb-6 text-foreground'>Edit Player</h2>
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+					<FormField
+						control={form.control}
+						name='name'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Name</FormLabel>
+								<FormControl>
+									<Input placeholder='Enter player name' {...field} autoFocus />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Team
-					</label>
-					<select
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						value={form.team}
-						onChange={(e) => setForm((f) => ({ ...f, team: e.target.value }))}
-						required
+					<FormField
+						control={form.control}
+						name='teamIds'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Teams</FormLabel>
+								<FormControl>
+									<select
+										multiple
+										value={field.value}
+										onChange={(e) => {
+											const options = Array.from(
+												e.target.selectedOptions,
+												(option) => option.value
+											);
+											field.onChange(options);
+										}}
+										className='w-full min-h-[3rem] border rounded px-2 py-1 bg-background text-foreground'
+									>
+										{teams.map((team) => (
+											<option key={team.id} value={team.id}>
+												{team.name}
+											</option>
+										))}
+									</select>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button
+						type='submit'
+						className='w-full bg-primary text-primary-foreground hover:bg-primary/90'
 					>
-						<option value='' disabled>
-							Select a team
-						</option>
-						{teams.map((team) => (
-							<option key={team.id} value={team.name}>
-								{team.name}
-							</option>
-						))}
-					</select>
-				</div>
-				<button
-					type='submit'
-					className='w-full py-2 bg-league-black text-league-light rounded font-bold hover:bg-league-dark transition'
-				>
-					Save Changes
-				</button>
-			</form>
+						Save Changes
+					</Button>
+				</form>
+			</Form>
 		</div>
 	);
 }

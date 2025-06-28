@@ -2,35 +2,64 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import leaguesData from "@/data/leagues.json";
+import { getLeague, updateLeague } from "@/api/leagues";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+	Form,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormControl,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-interface League {
-	id: string;
-	name: string;
-	type: string;
-	demographic: string;
-	division: string;
-	sport: string;
-	rulesUrl: string;
-	startDate: string;
-	endDate: string;
-	status: string;
-	teamFee: string;
-	playerFee: string;
-	otherFeeInfo: string;
-	moreInfo: string;
-	standingsOptions?: {
-		pointsFormula: Record<string, number>;
-		tiebreakers: string[];
-	};
-}
+const formSchema = z.object({
+	name: z.string().min(1, "Name is required."),
+	type: z.string().optional(),
+	demographic: z.string().optional(),
+	division: z.string().optional(),
+	sport: z.string().min(1, "Sport is required."),
+	rulesUrl: z.string().optional(),
+	startDate: z.string().optional(),
+	endDate: z.string().optional(),
+	status: z.string().optional(),
+	teamFee: z.string().optional(),
+	playerFee: z.string().optional(),
+	otherFeeInfo: z.string().optional(),
+	moreInfo: z.string().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export default function EditLeaguePage(props: {
 	params: Promise<{ id: string }>;
 }) {
 	const [leagueId, setLeagueId] = useState<string | null>(null);
-	const [form, setForm] = useState<League | null>(null);
+	const [loading, setLoading] = useState(true);
 	const router = useRouter();
+
+	const form = useForm<FormValues>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			name: "",
+			type: "",
+			demographic: "",
+			division: "",
+			sport: "",
+			rulesUrl: "",
+			startDate: "",
+			endDate: "",
+			status: "",
+			teamFee: "",
+			playerFee: "",
+			otherFeeInfo: "",
+			moreInfo: "",
+		},
+	});
 
 	useEffect(() => {
 		Promise.resolve(props.params).then((params) => {
@@ -40,199 +69,231 @@ export default function EditLeaguePage(props: {
 
 	useEffect(() => {
 		if (!leagueId) return;
-		const league = (leaguesData as League[]).find((l) => l.id === leagueId);
-		if (league) setForm(league);
+		getLeague(leagueId).then((data) => {
+			form.reset(data);
+			setLoading(false);
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [leagueId]);
 
-	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-	) => {
-		const { name, value } = e.target;
-		setForm((f) => (f ? { ...f, [name]: value } : f));
+	const onSubmit = async (values: FormValues) => {
+		if (leagueId) {
+			await updateLeague(leagueId, values);
+			router.push("/admin/leagues");
+		}
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// In a real app, submit to API here
-		router.push("/admin/leagues");
-	};
-
-	if (!form) return <div className='text-league-black'>Loading...</div>;
+	if (loading) return <div className='text-league-black'>Loading...</div>;
 	return (
 		<div className='max-w-lg mx-auto'>
-			<div className='mb-6'>
+			<div className='mb-6 flex flex-col gap-2'>
 				<Link
-					href='../standings-options'
+					href={`../standings-options`}
 					className='inline-block px-4 py-2 border border-league-mediumdark bg-league-dark text-league-light rounded font-semibold hover:bg-league-black transition'
 				>
 					Edit Standings Options
 				</Link>
+				{leagueId && (
+					<Link
+						href={`/admin/teams?leagueId=${leagueId}`}
+						className='inline-block px-4 py-2 border border-league-mediumdark bg-league-black text-league-light rounded font-semibold hover:bg-league-dark transition'
+					>
+						Add Team to League
+					</Link>
+				)}
 			</div>
 			<h2 className='text-2xl font-bold mb-6 text-league-dark'>Edit League</h2>
-			<form
-				className='space-y-6 bg-league-light p-6 rounded shadow border border-league-mediumdark'
-				onSubmit={handleSubmit}
-			>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Name
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='name'
-						value={form.name}
-						onChange={handleChange}
-						required
-						autoFocus
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Type
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='type'
-						value={form.type}
-						onChange={handleChange}
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Demographic
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='demographic'
-						value={form.demographic}
-						onChange={handleChange}
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Division
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='division'
-						value={form.division}
-						onChange={handleChange}
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Sport
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='sport'
-						value={form.sport}
-						onChange={handleChange}
-						required
-						placeholder='e.g. Indoor Soccer, Outdoor Soccer'
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Rules URL
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='rulesUrl'
-						value={form.rulesUrl}
-						onChange={handleChange}
-						placeholder='https://example.com/rules'
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Start Date
-					</label>
-					<input
-						type='text'
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='startDate'
-						value={form.startDate}
-						onChange={handleChange}
-						placeholder='YYYY-MM-DD'
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						End Date
-					</label>
-					<input
-						type='text'
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='endDate'
-						value={form.endDate}
-						onChange={handleChange}
-						placeholder='YYYY-MM-DD'
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Status
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='status'
-						value={form.status}
-						onChange={handleChange}
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Team Fee
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='teamFee'
-						value={form.teamFee}
-						onChange={handleChange}
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Player Fee
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='playerFee'
-						value={form.playerFee}
-						onChange={handleChange}
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						Other Fee Info
-					</label>
-					<input
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='otherFeeInfo'
-						value={form.otherFeeInfo}
-						onChange={handleChange}
-					/>
-				</div>
-				<div>
-					<label className='block mb-1 font-semibold text-league-black'>
-						More Info
-					</label>
-					<textarea
-						className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-						name='moreInfo'
-						value={form.moreInfo}
-						onChange={handleChange}
-						rows={3}
-					/>
-				</div>
-				<button
-					type='submit'
-					className='w-full py-2 bg-league-black text-league-light rounded font-bold hover:bg-league-dark transition'
+			<Form {...form}>
+				<form
+					className='space-y-6 p-6 rounded border'
+					onSubmit={form.handleSubmit(onSubmit)}
 				>
-					Save Changes
-				</button>
-			</form>
+					<FormField
+						control={form.control}
+						name='name'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Name</FormLabel>
+								<FormControl>
+									<Input placeholder='League name' {...field} autoFocus />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='type'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Type</FormLabel>
+								<FormControl>
+									<Input placeholder='Type' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='demographic'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Demographic</FormLabel>
+								<FormControl>
+									<Input placeholder='Demographic' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='division'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Division</FormLabel>
+								<FormControl>
+									<Input placeholder='Division' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='sport'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Sport</FormLabel>
+								<FormControl>
+									<Input
+										placeholder='e.g. Indoor Soccer, Outdoor Soccer'
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='rulesUrl'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Rules URL</FormLabel>
+								<FormControl>
+									<Input placeholder='https://example.com/rules' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='startDate'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Start Date</FormLabel>
+								<FormControl>
+									<Input placeholder='YYYY-MM-DD' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='endDate'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>End Date</FormLabel>
+								<FormControl>
+									<Input placeholder='YYYY-MM-DD' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='status'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Status</FormLabel>
+								<FormControl>
+									<Input placeholder='Status' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='teamFee'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Team Fee</FormLabel>
+								<FormControl>
+									<Input placeholder='Team Fee' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='playerFee'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Player Fee</FormLabel>
+								<FormControl>
+									<Input placeholder='Player Fee' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='otherFeeInfo'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Other Fee Info</FormLabel>
+								<FormControl>
+									<Input placeholder='Other Fee Info' {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='moreInfo'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>More Info</FormLabel>
+								<FormControl>
+									<textarea
+										className='w-full px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
+										name='moreInfo'
+										value={field.value}
+										onChange={field.onChange}
+										rows={3}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<Button
+						type='submit'
+						className='w-full py-2 bg-league-black text-league-light rounded font-bold hover:bg-league-dark transition'
+					>
+						Save Changes
+					</Button>
+				</form>
+			</Form>
 		</div>
 	);
 }

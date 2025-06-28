@@ -1,44 +1,82 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { getTeams } from "@/api/teams";
+import { Team } from "@/api/types";
+import { Button } from "@/components/ui/button";
+import {
+	Table,
+	TableHeader,
+	TableBody,
+	TableRow,
+	TableHead,
+	TableCell,
+} from "@/components/ui/table";
 
-const teams = [
-	{ id: "1", name: "Manchester United" },
-	{ id: "2", name: "Liverpool" },
-	{ id: "3", name: "Chelsea" },
-];
+function AdminTeamsPageInner() {
+	const searchParams = useSearchParams();
+	const leagueId = searchParams.get("leagueId");
+	const [teams, setTeams] = useState<Team[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		getTeams(leagueId || undefined)
+			.then((data) => setTeams(data))
+			.finally(() => setLoading(false));
+	}, [leagueId]);
+
+	if (loading) return <div>Loading...</div>;
+
+	return (
+		<div>
+			<div className='flex justify-between items-center mb-6'>
+				<h2 className='text-2xl font-bold text-league-dark'>Teams</h2>
+				<Button asChild>
+					<Link
+						href={
+							leagueId
+								? `/admin/teams/new?leagueId=${leagueId}`
+								: "/admin/teams/new"
+						}
+					>
+						Add Team
+					</Link>
+				</Button>
+			</div>
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Team Name</TableHead>
+						<TableHead>Actions</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{teams.map((team) => (
+						<TableRow key={team.id}>
+							<TableCell className='font-semibold'>{team.name}</TableCell>
+							<TableCell className='flex gap-2'>
+								<Button asChild size='sm' variant='default'>
+									<Link href={`/admin/teams/${team.id}/edit`}>Edit</Link>
+								</Button>
+								<Button asChild size='sm' variant='secondary'>
+									<Link href={`/admin/teams/${team.id}/players`}>
+										View Roster
+									</Link>
+								</Button>
+							</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</div>
+	);
+}
 
 export default function AdminTeamsPage() {
 	return (
-		<div>
-			<h2 className='text-2xl font-bold mb-6 text-league-dark'>Teams</h2>
-			<table className='w-full bg-league-light rounded shadow border border-league-mediumdark'>
-				<thead>
-					<tr className='bg-league-mediumdark text-league-light'>
-						<th className='py-2 px-4 text-left'>Team Name</th>
-						<th className='py-2 px-4'>Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					{teams.map((team) => (
-						<tr key={team.id} className='border-t border-league-medium'>
-							<td className='py-2 px-4 font-semibold'>{team.name}</td>
-							<td className='py-2 px-4 flex gap-2'>
-								<Link
-									href={`/admin/teams/${team.id}/edit`}
-									className='px-3 py-1 bg-league-black text-league-light rounded hover:bg-league-dark font-semibold transition'
-								>
-									Edit
-								</Link>
-								<Link
-									href={`/admin/teams/${team.id}/players`}
-									className='px-3 py-1 bg-league-mediumdark text-league-light rounded hover:bg-league-dark font-semibold transition'
-								>
-									View Roster
-								</Link>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
+		<Suspense>
+			<AdminTeamsPageInner />
+		</Suspense>
 	);
 }

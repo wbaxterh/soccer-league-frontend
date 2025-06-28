@@ -1,5 +1,21 @@
 "use client";
 import { useState } from "react";
+import {
+	Table,
+	TableHeader,
+	TableBody,
+	TableRow,
+	TableHead,
+	TableCell,
+} from "@/components/ui/table";
+import {
+	Select,
+	SelectTrigger,
+	SelectValue,
+	SelectContent,
+	SelectItem,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 const allGames = [
 	{
@@ -44,56 +60,55 @@ export default function AdminSchedulePage() {
 	};
 
 	return (
-		<div>
-			<h2 className='text-2xl font-bold mb-6 text-league-dark'>
-				Game Schedule
-			</h2>
+		<div className='max-w-4xl mx-auto bg-card p-8 rounded shadow text-card-foreground border border-border'>
+			<h2 className='text-2xl font-bold mb-6 text-foreground'>Game Schedule</h2>
 			<div className='mb-4 flex items-center gap-4'>
-				<label className='font-semibold text-league-black'>
+				<span className='font-semibold text-foreground'>
 					Filter by Division:
-				</label>
-				<select
-					className='px-3 py-2 border border-league-mediumdark rounded bg-league-light text-league-black'
-					value={division}
-					onChange={(e) => setDivision(e.target.value)}
-				>
-					<option value=''>All</option>
-					{divisions.map((d) => (
-						<option key={d} value={d}>
-							{d}
-						</option>
-					))}
-				</select>
+				</span>
+				<Select value={division} onValueChange={setDivision}>
+					<SelectTrigger className='w-40'>
+						<SelectValue placeholder='All' />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value=''>All</SelectItem>
+						{divisions.map((d) => (
+							<SelectItem key={d} value={d}>
+								{d}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
 			</div>
-			<table className='w-full bg-league-light rounded shadow border border-league-mediumdark'>
-				<thead>
-					<tr className='bg-league-mediumdark text-league-light'>
-						<th className='py-2 px-4 text-left'>Date</th>
-						<th className='py-2 px-4 text-left'>Home</th>
-						<th className='py-2 px-4 text-left'>Away</th>
-						<th className='py-2 px-4 text-left'>Division</th>
-						<th className='py-2 px-4 text-left'>Result</th>
-					</tr>
-				</thead>
-				<tbody>
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Date</TableHead>
+						<TableHead>Home</TableHead>
+						<TableHead>Away</TableHead>
+						<TableHead>Division</TableHead>
+						<TableHead>Result</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
 					{filteredGames.map((game) => (
-						<tr key={game.id} className='border-t border-league-medium'>
-							<td className='py-2 px-4'>{game.date}</td>
-							<td className='py-2 px-4'>{game.home}</td>
-							<td className='py-2 px-4'>{game.away}</td>
-							<td className='py-2 px-4'>{game.division}</td>
-							<td className='py-2 px-4'>
-								<input
-									className='px-2 py-1 border border-league-mediumdark rounded bg-league-light text-league-black w-24'
+						<TableRow key={game.id}>
+							<TableCell>{game.date}</TableCell>
+							<TableCell>{game.home}</TableCell>
+							<TableCell>{game.away}</TableCell>
+							<TableCell>{game.division}</TableCell>
+							<TableCell>
+								<Input
+									className='w-24'
 									value={game.result}
 									onChange={(e) => handleResultChange(game.id, e.target.value)}
 									placeholder='Result'
 								/>
-							</td>
-						</tr>
+							</TableCell>
+						</TableRow>
 					))}
-				</tbody>
-			</table>
+				</TableBody>
+			</Table>
 		</div>
 	);
 }
