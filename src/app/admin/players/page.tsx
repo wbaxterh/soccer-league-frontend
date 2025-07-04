@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,18 +21,24 @@ import {
 	DialogClose,
 } from "@/components/ui/dialog";
 import { Player } from "@/api/types";
-
-const initialPlayers: Player[] = [
-	{ id: "1", name: "Cristiano Ronaldo", teamIds: ["1"] },
-	{ id: "2", name: "Lionel Messi", teamIds: ["2"] },
-	{ id: "3", name: "Kevin De Bruyne", teamIds: ["3"] },
-];
+import { getPlayers, deletePlayer } from "@/api/players";
+import { getTeams } from "@/api/teams";
+import { Team } from "@/api/types";
 
 export default function AdminPlayersPage() {
-	const [players, setPlayers] = useState<Player[]>(initialPlayers);
+	const [players, setPlayers] = useState<Player[]>([]);
+	const [teams, setTeams] = useState<Team[]>([]);
 	const [deleteId, setDeleteId] = useState<string | null>(null);
 
-	const handleDelete = (id: string) => {
+	useEffect(() => {
+		getPlayers().then(setPlayers);
+		getTeams().then(setTeams);
+	}, []);
+
+	const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
+
+	const handleDelete = async (id: string) => {
+		await deletePlayer(id);
 		setPlayers((players) => players.filter((p) => p.id !== id));
 		setDeleteId(null);
 	};
@@ -62,7 +68,11 @@ export default function AdminPlayersPage() {
 					{players.map((player) => (
 						<TableRow key={player.id}>
 							<TableCell className='font-semibold'>{player.name}</TableCell>
-							<TableCell>{player.teamIds.join(", ")}</TableCell>
+							<TableCell>
+								{Array.isArray(player.teamIds) && player.teamIds.length > 0
+									? player.teamIds.map((tid) => teamMap[tid] || tid).join(", ")
+									: "No team"}
+							</TableCell>
 							<TableCell className='flex gap-2'>
 								<Button asChild size='sm' variant='default'>
 									<Link href={`/admin/players/${player.id}/edit`}>Edit</Link>
