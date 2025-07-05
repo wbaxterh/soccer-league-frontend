@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	Table,
 	TableHeader,
@@ -16,8 +16,19 @@ import {
 	SelectItem,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { getTeams } from "@/api/teams";
+import { getGames, createGame } from "@/api/games";
+import { Team, Game } from "@/api/types";
 
-const allGames = [
+const allGames: {
+	id: string;
+	division: string;
+	home: string;
+	away: string;
+	date: string;
+	result: string;
+	location: string;
+}[] = [
 	{
 		id: "1",
 		division: "A",
@@ -25,6 +36,7 @@ const allGames = [
 		away: "Liverpool",
 		date: "2024-07-01",
 		result: "",
+		location: "Old Trafford",
 	},
 	{
 		id: "2",
@@ -33,6 +45,7 @@ const allGames = [
 		away: "Manchester United",
 		date: "2024-07-08",
 		result: "",
+		location: "Stamford Bridge",
 	},
 	{
 		id: "3",
@@ -41,44 +54,87 @@ const allGames = [
 		away: "Barcelona",
 		date: "2024-07-10",
 		result: "",
+		location: "Bernabeu",
 	},
 ];
 const divisions = ["A", "B"];
 
 export default function AdminSchedulePage() {
-	const [division, setDivision] = useState("");
-	const [games, setGames] = useState(allGames);
+	const [games, setGames] = useState<Game[]>([]);
+	const [teams, setTeams] = useState<Team[]>([]);
+	const [homeTeam, setHomeTeam] = useState("");
+	const [awayTeam, setAwayTeam] = useState("");
+	const [date, setDate] = useState("");
 
-	const filteredGames = division
-		? games.filter((g) => g.division === division)
-		: games;
+	useEffect(() => {
+		getTeams().then(setTeams);
+		getGames().then(setGames);
+	}, []);
 
-	const handleResultChange = (id: string, value: string) => {
-		setGames((games) =>
-			games.map((g) => (g.id === id ? { ...g, result: value } : g))
-		);
+	const teamMap = Object.fromEntries(teams.map((t) => [t.id, t.name]));
+
+	const handleAddGame = async () => {
+		if (!homeTeam || !awayTeam || !date) return;
+		await createGame({ home: homeTeam, away: awayTeam, date });
+		getGames().then(setGames);
+		setHomeTeam("");
+		setAwayTeam("");
+		setDate("");
 	};
 
 	return (
 		<div className='max-w-4xl mx-auto bg-card p-8 rounded shadow text-card-foreground border border-border'>
 			<h2 className='text-2xl font-bold mb-6 text-foreground'>Game Schedule</h2>
-			<div className='mb-4 flex items-center gap-4'>
-				<span className='font-semibold text-foreground'>
-					Filter by Division:
-				</span>
-				<Select value={division} onValueChange={setDivision}>
-					<SelectTrigger className='w-40'>
-						<SelectValue placeholder='All' />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value=''>All</SelectItem>
-						{divisions.map((d) => (
-							<SelectItem key={d} value={d}>
-								{d}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+			<div className='mb-8 flex flex-wrap gap-4 items-end'>
+				<div>
+					<div className='font-semibold mb-1'>Home Team</div>
+					<Select value={homeTeam} onValueChange={setHomeTeam}>
+						<SelectTrigger className='w-48'>
+							<SelectValue placeholder='Select Home Team' />
+						</SelectTrigger>
+						<SelectContent>
+							{teams.map((t) => (
+								<SelectItem key={t.id} value={t.id}>
+									{t.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+				<div>
+					<div className='font-semibold mb-1'>Away Team</div>
+					<Select value={awayTeam} onValueChange={setAwayTeam}>
+						<SelectTrigger className='w-48'>
+							<SelectValue placeholder='Select Away Team' />
+						</SelectTrigger>
+						<SelectContent>
+							{teams
+								.filter((t) => t.id !== homeTeam)
+								.map((t) => (
+									<SelectItem key={t.id} value={t.id}>
+										{t.name}
+									</SelectItem>
+								))}
+						</SelectContent>
+					</Select>
+				</div>
+				<div>
+					<div className='font-semibold mb-1'>Date</div>
+					<Input
+						type='date'
+						value={date}
+						onChange={(e) => setDate(e.target.value)}
+						className='w-40'
+					/>
+				</div>
+				<button
+					type='button'
+					className='bg-primary text-primary-foreground px-4 py-2 rounded font-semibold'
+					onClick={handleAddGame}
+					disabled={!homeTeam || !awayTeam || !date}
+				>
+					Add Game
+				</button>
 			</div>
 			<Table>
 				<TableHeader>
@@ -86,25 +142,14 @@ export default function AdminSchedulePage() {
 						<TableHead>Date</TableHead>
 						<TableHead>Home</TableHead>
 						<TableHead>Away</TableHead>
-						<TableHead>Division</TableHead>
-						<TableHead>Result</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{filteredGames.map((game) => (
+					{games.map((game) => (
 						<TableRow key={game.id}>
 							<TableCell>{game.date}</TableCell>
-							<TableCell>{game.home}</TableCell>
-							<TableCell>{game.away}</TableCell>
-							<TableCell>{game.division}</TableCell>
-							<TableCell>
-								<Input
-									className='w-24'
-									value={game.result}
-									onChange={(e) => handleResultChange(game.id, e.target.value)}
-									placeholder='Result'
-								/>
-							</TableCell>
+							<TableCell>{teamMap[game.home] || game.home}</TableCell>
+							<TableCell>{teamMap[game.away] || game.away}</TableCell>
 						</TableRow>
 					))}
 				</TableBody>

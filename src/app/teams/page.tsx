@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Card,
 	CardContent,
@@ -12,22 +12,15 @@ import { Button } from "@/components/ui/button";
 import { getTeams } from "@/api/teams";
 import { Team } from "@/api/types";
 
-export default function TeamsPage({
-	params,
-}: {
-	params: Promise<{ leagueId: string }>;
-}) {
-	const { leagueId } = use(params);
+export default function TeamsPage() {
 	const [teams, setTeams] = useState<Team[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (!leagueId) return;
-		setLoading(true);
-		getTeams(leagueId)
+		getTeams()
 			.then((data) => setTeams(data))
 			.finally(() => setLoading(false));
-	}, [leagueId]);
+	}, []);
 
 	if (loading) return <div>Loading...</div>;
 
@@ -55,9 +48,7 @@ export default function TeamsPage({
 								asChild
 								className='w-full bg-primary text-primary-foreground hover:bg-primary/90'
 							>
-								<Link href={`/leagues/${leagueId}/teams/${team.id}`}>
-									View Team
-								</Link>
+								<Link href={`/teams/${team.id}`}>View Team</Link>
 							</Button>
 						</CardContent>
 					</Card>

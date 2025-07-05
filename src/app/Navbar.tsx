@@ -29,9 +29,20 @@ export default function Navbar() {
 								aria-label='Toggle menu'
 								className='text-card-foreground'
 							>
-								<span className='block w-6 h-0.5 bg-foreground mb-1' />
-								<span className='block w-6 h-0.5 bg-foreground mb-1' />
-								<span className='block w-6 h-0.5 bg-foreground' />
+								<svg
+									width='28'
+									height='28'
+									viewBox='0 0 24 24'
+									fill='none'
+									stroke='currentColor'
+									strokeWidth='2'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+								>
+									<line x1='4' y1='6' x2='20' y2='6' />
+									<line x1='4' y1='12' x2='20' y2='12' />
+									<line x1='4' y1='18' x2='20' y2='18' />
+								</svg>
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className='w-48 mt-2'>

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 export default function SidebarNav() {
 	const pathname = usePathname();
 	return (
-		<nav className='flex flex-col gap-4'>
+		<nav className='flex flex-row md:flex-col gap-x-4 md:gap-x-0 md:gap-y-4 w-full'>
 			<Link
 				href='/admin/leagues'
 				className={`hover:text-muted-foreground font-semibold rounded px-2 py-1 ${

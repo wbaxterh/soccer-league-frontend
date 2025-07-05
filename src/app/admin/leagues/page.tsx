@@ -22,6 +22,13 @@ import {
 	DialogDescription,
 	DialogClose,
 } from "@/components/ui/dialog";
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	CardDescription,
+} from "@/components/ui/card";
 
 export default function AdminLeaguesPage() {
 	const [leagues, setLeagues] = useState<League[]>([]);
@@ -49,43 +56,69 @@ export default function AdminLeaguesPage() {
 					</Link>
 				</Button>
 			</div>
-			<div className='overflow-x-auto'>
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Type</TableHead>
-							<TableHead>Demographic</TableHead>
-							<TableHead>Division</TableHead>
-							<TableHead>Sport</TableHead>
-							<TableHead>Start Date</TableHead>
-							<TableHead>End Date</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead>Team Fee</TableHead>
-							<TableHead>Player Fee</TableHead>
-							<TableHead>Other Fee Info</TableHead>
-							<TableHead>More Info</TableHead>
-							<TableHead>Rules</TableHead>
-							<TableHead>Actions</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{leagues.map((league) => (
-							<TableRow key={league.id}>
-								<TableCell className='font-semibold'>{league.name}</TableCell>
-								<TableCell>{league.type}</TableCell>
-								<TableCell>{league.demographic}</TableCell>
-								<TableCell>{league.division}</TableCell>
-								<TableCell>{league.sport}</TableCell>
-								<TableCell>{league.startDate}</TableCell>
-								<TableCell>{league.endDate}</TableCell>
-								<TableCell>{league.status}</TableCell>
-								<TableCell>{league.teamFee}</TableCell>
-								<TableCell>{league.playerFee}</TableCell>
-								<TableCell>{league.otherFeeInfo}</TableCell>
-								<TableCell>{league.moreInfo}</TableCell>
-								<TableCell>
-									{league.rulesUrl && (
+			<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+				{leagues.map((league) => (
+					<Card
+						key={league.id}
+						className='bg-card text-card-foreground border border-border'
+					>
+						<CardHeader>
+							<CardTitle className='text-xl font-semibold'>
+								{league.name}
+							</CardTitle>
+							<CardDescription className='text-muted-foreground'>
+								{league.description}
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<div className='mb-4 space-y-1 text-sm'>
+								<div>
+									<span className='font-semibold'>Type:</span>{" "}
+									{league.type || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Demographic:</span>{" "}
+									{league.demographic || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Division:</span>{" "}
+									{league.division || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Sport:</span>{" "}
+									{league.sport || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Start Date:</span>{" "}
+									{league.startDate || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>End Date:</span>{" "}
+									{league.endDate || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Status:</span>{" "}
+									{league.status || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Team Fee:</span>{" "}
+									{league.teamFee || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Player Fee:</span>{" "}
+									{league.playerFee || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Other Fee Info:</span>{" "}
+									{league.otherFeeInfo || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>More Info:</span>{" "}
+									{league.moreInfo || "-"}
+								</div>
+								<div>
+									<span className='font-semibold'>Rules:</span>{" "}
+									{league.rulesUrl ? (
 										<a
 											href={league.rulesUrl}
 											className='text-blue-600 underline'
@@ -94,59 +127,62 @@ export default function AdminLeaguesPage() {
 										>
 											Rules
 										</a>
+									) : (
+										"-"
 									)}
-								</TableCell>
-								<TableCell className='flex gap-2'>
-									<Button asChild size='sm' variant='default'>
-										<Link
-											href={`/admin/leagues/${league.id}/edit`}
-											className='px-3 py-1 bg-primary text-primary-foreground rounded hover:bg-primary/90 font-semibold transition'
+								</div>
+							</div>
+							<div className='flex gap-2'>
+								<Button
+									asChild
+									className='flex-1 bg-primary text-primary-foreground hover:bg-primary/90'
+								>
+									<Link href={`/admin/leagues/${league.id}/edit`}>Edit</Link>
+								</Button>
+								<Dialog>
+									<DialogTrigger asChild>
+										<Button
+											size='sm'
+											className='flex-1'
+											variant='destructive'
+											onClick={() => setDeleteId(league.id)}
 										>
-											Edit
-										</Link>
-									</Button>
-									<Dialog>
-										<DialogTrigger asChild>
-											<Button
-												size='sm'
-												variant='destructive'
-												onClick={() => setDeleteId(league.id)}
-											>
-												Delete
-											</Button>
-										</DialogTrigger>
-										{deleteId === league.id && (
-											<DialogContent>
-												<DialogHeader>
-													<DialogTitle>Are you sure?</DialogTitle>
-													<DialogDescription>
-														This will permanently delete the league.
-													</DialogDescription>
-												</DialogHeader>
-												<DialogFooter>
-													<DialogClose asChild>
-														<Button
-															variant='outline'
-															onClick={() => setDeleteId(null)}
-														>
-															Cancel
-														</Button>
-													</DialogClose>
+											Delete
+										</Button>
+									</DialogTrigger>
+									{deleteId === league.id && (
+										<DialogContent>
+											<DialogHeader>
+												<DialogTitle>Are you sure?</DialogTitle>
+												<DialogDescription>
+													Deleting this league will remove all league, team, and
+													player data associated with it. This action cannot be
+													undone.
+												</DialogDescription>
+											</DialogHeader>
+											<DialogFooter>
+												<DialogClose asChild>
 													<Button
-														variant='destructive'
-														onClick={() => handleDelete(league.id)}
+														variant='outline'
+														onClick={() => setDeleteId(null)}
 													>
-														Delete
+														Cancel
 													</Button>
-												</DialogFooter>
-											</DialogContent>
-										)}
-									</Dialog>
-								</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
+												</DialogClose>
+												<Button
+													variant='destructive'
+													onClick={() => handleDelete(league.id)}
+												>
+													Delete
+												</Button>
+											</DialogFooter>
+										</DialogContent>
+									)}
+								</Dialog>
+							</div>
+						</CardContent>
+					</Card>
+				))}
 			</div>
 		</div>
 	);

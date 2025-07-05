@@ -45,13 +45,13 @@ export default function LeagueDetailPage({
 					asChild
 					className='bg-primary text-primary-foreground hover:bg-primary/90'
 				>
-					<Link href={`/leagues/${league.id}/teams`}>Teams</Link>
+					<Link href={`/teams?league=${league.id}`}>Teams</Link>
 				</Button>
 				<Button
 					asChild
 					className='bg-primary text-primary-foreground hover:bg-primary/90'
 				>
-					<Link href={`/leagues/${league.id}/players`}>Players</Link>
+					<Link href={`/players?league=${league.id}`}>Players</Link>
 				</Button>
 				<Button
 					asChild
